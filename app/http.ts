@@ -23,7 +23,7 @@ interface HTTPRequest {
   body: HTTPBody;
 }
 
-export function parseHttpMessage(buffer: Buffer): HTTPRequest {
+export function parseHttpRequest(buffer: Buffer): HTTPRequest {
   const data = decode(buffer);
   const lines = data.split("\r\n").filter((val) => val.length);
 

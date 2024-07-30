@@ -1,6 +1,6 @@
 import * as net from "net";
-import { decode, encode } from "./utils";
-import { parseHttpMessage } from "./http";
+import { encode } from "./utils";
+import { parseHttpRequest } from "./http";
 
 interface Route {
   name: string;
@@ -23,7 +23,7 @@ function resolveRoute(target: string): Route | null {
 
 const server = net.createServer((socket) => {
   socket.on("data", (buffer) => {
-    const req = parseHttpMessage(buffer);
+    const req = parseHttpRequest(buffer);
     console.log(req);
 
     const route = resolveRoute(req.target);
