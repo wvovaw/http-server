@@ -53,33 +53,39 @@ export function parseHttpRequest(buffer: Buffer): HTTPRequest {
 }
 
 export class HTTPResponse {
-  private data: string = "";
-  private code: HTTPStatusCode = "200 OK";
-  private headers: HTTPHeaders = {
+  private _data: string = "";
+  private _code: HTTPStatusCode = "200 OK";
+  private _headers: HTTPHeaders = {
     "Content-Type": "text/plain",
   };
 
   constructor() {}
 
   public send(data: string) {
-    this.data = String(data);
-    this.headers["Content-Length"] = String(this.data.length);
+    this._data = String(data);
+    this.headers({
+      "Content-Length": String(this._data.length),
+    });
     return this;
   }
   public status(code: HTTPStatusCode) {
-    this.code = code;
+    this._code = code;
+    return this;
+  }
+  public headers(headers: HTTPHeaders) {
+    Object.assign(this._headers, headers);
     return this;
   }
 
   private static encodeToHTTP(response: HTTPResponse): Buffer {
     const ENDL = "\r\n";
-    const statusLine = `HTTP/1.1 ${response.code}${ENDL}`;
-    const headers = Object.entries(response.headers)
+    const statusLine = `HTTP/1.1 ${response._code}${ENDL}`;
+    const headers = Object.entries(response._headers)
       .map(([key, value]) => {
         return `${key}: ${value}`;
       })
       .join(ENDL);
-    const body = response.data;
+    const body = response._data;
     return encode(statusLine + headers + ENDL + ENDL + body);
   }
 
