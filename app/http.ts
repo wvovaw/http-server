@@ -27,23 +27,21 @@ export interface HTTPRequest {
 
 export function parseHttpRequest(buffer: Buffer): HTTPRequest {
   const data = decode(buffer);
-  const lines = data.split("\r\n").filter((val) => val.length);
+  const [meta, body] = data.split("\r\n\r\n");
+  const metaLines = meta.split("\r\n");
 
-  const firstLine = lines[0];
-  const options = firstLine.split(" ");
+  const options = metaLines[0].split(" ");
   const method = options[0] as HTTPMethod;
   const target = options[1];
   const version = options[2] as HTTPVersion;
 
   const headers = {} as HTTPHeaders;
-  lines.slice(1, lines.length - 1).forEach((line) => {
+  metaLines.slice(1).forEach((line) => {
     const parts = line.split(": ");
     const key = parts[0];
     const value = parts.slice(1).join(": ");
     headers[key] = value;
   });
-
-  const body = lines[lines.length - 1];
 
   return {
     version,
