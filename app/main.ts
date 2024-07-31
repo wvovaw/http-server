@@ -21,6 +21,14 @@ const router = new Router([
       }
     },
   },
+  {
+    name: "user-agent",
+    path: "/user-agent",
+    handler: (req, res, ctx) => {
+      const userAgent = req.headers["User-Agent"];
+      res.send(userAgent);
+    },
+  },
 ]);
 
 const server = net.createServer((socket) => {
