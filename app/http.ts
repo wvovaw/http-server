@@ -1,4 +1,5 @@
-import { decode } from "./utils";
+import { Socket } from "net";
+import { decode, encode } from "./utils";
 
 type HTTPMethod =
   | "GET"
@@ -11,11 +12,12 @@ type HTTPMethod =
   | "OPTIONS"
   | "TRACE";
 type HTTPVersion = "HTTP/1.1";
+type HTTPStatusCode = string;
 
 type HTTPHeaders = Record<string, string>;
 type HTTPBody = string;
 
-interface HTTPRequest {
+export interface HTTPRequest {
   method: HTTPMethod;
   target: string;
   version: HTTPVersion;
@@ -50,4 +52,45 @@ export function parseHttpRequest(buffer: Buffer): HTTPRequest {
     headers,
     body,
   };
+}
+
+export class HTTPResponse {
+  private data: string = "";
+  private code: HTTPStatusCode = "200 OK";
+  private headers: HTTPHeaders = {
+    "Content-Type": "text/plain",
+  };
+
+  constructor() {}
+
+  public send(data: string) {
+    this.data = String(data);
+    this.headers["Content-Length"] = String(this.data.length);
+    return this;
+  }
+  public status(code: HTTPStatusCode) {
+    this.code = code;
+    return this;
+  }
+
+  private static encodeToHTTP(response: HTTPResponse): Buffer {
+    const ENDL = "\r\n";
+    const statusLine = `HTTP/1.1 ${response.code}${ENDL}`;
+    const headers = Object.entries(response.headers)
+      .map(([key, value]) => {
+        return `${key}: ${value}`;
+      })
+      .join(ENDL);
+    const body = response.data;
+    return encode(statusLine + headers + ENDL + ENDL + body);
+  }
+
+  public finish() {
+    return HTTPResponse.encodeToHTTP(this);
+  }
+}
+
+export function createHttpResponse() {
+  const response = new HTTPResponse();
+  return response;
 }

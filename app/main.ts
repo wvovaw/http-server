@@ -1,40 +1,36 @@
 import * as net from "net";
-import { encode } from "./utils";
-import { parseHttpRequest } from "./http";
+import { decode, encode } from "./utils";
+import { createHttpResponse, parseHttpRequest } from "./http";
+import { createRouterContext, Router } from "./router";
 
-interface Route {
-  name: string;
-  handler: () => void;
-}
-
-const router: Route[] = [
+const router = new Router([
   {
-    name: "/",
+    name: "index",
+    path: "/",
     handler: () => {
       console.log("index route handler run");
     },
   },
-];
-
-function resolveRoute(target: string): Route | null {
-  const route = router.find((route) => route.name === target) ?? null;
-  return route;
-}
+  {
+    name: "echo",
+    path: "/echo/:msg",
+    handler: (req, res, ctx) => {
+      if (ctx.params) {
+        console.log("echo route handler run with the :msg = ", ctx.params?.msg);
+        res.send(ctx.params.msg);
+      }
+    },
+  },
+]);
 
 const server = net.createServer((socket) => {
   socket.on("data", (buffer) => {
-    const req = parseHttpRequest(buffer);
-    console.log(req);
+    const request = parseHttpRequest(buffer);
+    const response = createHttpResponse();
+    const context = createRouterContext();
 
-    const route = resolveRoute(req.target);
-    if (route) {
-      route.handler();
-      const response = encode("HTTP/1.1 200 OK\r\n\r\n");
-      socket.write(response);
-    } else {
-      const response = encode("HTTP/1.1 404 Not Found\r\n\r\n");
-      socket.write(response);
-    }
+    const result = router.handle(request, response, context);
+    socket.write(result);
   });
 
   socket.on("close", () => {
