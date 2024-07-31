@@ -6,7 +6,7 @@ import { args } from "../config";
 export default {
   name: "files",
   path: "/files/:filename",
-  handler: (req, res, ctx) => {
+  handler: (_req, res, ctx) => {
     const filePath = resolve(args.directory!, ctx.params?.filename!);
     const isFileExist = existsSync(filePath);
 
