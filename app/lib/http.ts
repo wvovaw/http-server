@@ -1,7 +1,7 @@
 import { Socket } from "net";
 import { decode, encode } from "./utils";
 
-type HTTPMethod =
+export type HTTPMethod =
   | "GET"
   | "HEAD"
   | "POST"

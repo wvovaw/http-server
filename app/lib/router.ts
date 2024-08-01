@@ -1,6 +1,7 @@
-import { HTTPRequest, HTTPResponse } from "./http";
+import { HTTPMethod, HTTPRequest, HTTPResponse } from "./http";
 
 export interface Route {
+  method: HTTPMethod;
   name: string;
   path: string;
   handler: (req: HTTPRequest, res: HTTPResponse, ctx: RouteContext) => void;
@@ -25,12 +26,11 @@ export class Router {
     res.status("404 Not Found");
   }
 
-  private findMatchingRoute(target: string) {
+  private findMatchingRoute(target: string, method: HTTPMethod) {
     const matchingRoute = this.routes.find((route) => {
       const reg = route.path.replace(/:([^/]+)/g, "([^/]+)");
-
       const regex = new RegExp(`^${reg}\/?$`);
-      return regex.test(target);
+      return regex.test(target) && route.method === method;
     });
     return matchingRoute;
   }
@@ -56,7 +56,10 @@ export class Router {
     response: HTTPResponse,
     ctx: RouteContext,
   ): Buffer {
-    const matchingRoute = this.findMatchingRoute(request.target);
+    const matchingRoute = this.findMatchingRoute(
+      request.target,
+      request.method,
+    );
 
     if (matchingRoute) {
       const params = this.extractParams(request.target, matchingRoute);

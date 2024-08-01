@@ -1,6 +1,7 @@
 import { type Route } from "../lib";
 
-export default {
+const route: Route = {
+  method: "GET",
   name: "echo",
   path: "/echo/:msg",
   handler: (req, res, ctx) => {
@@ -9,4 +10,6 @@ export default {
       res.send(ctx.params.msg);
     }
   },
-} as Route;
+};
+
+export default route;

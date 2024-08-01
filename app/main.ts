@@ -5,7 +5,13 @@ import echo from "./controllers/echo";
 import files from "./controllers/files";
 import { args } from "./config";
 
-const router = new Router([index, userAgent, echo, files]);
+const router = new Router([
+  index,
+  userAgent,
+  echo,
+  files.upload,
+  files.download,
+]);
 const server = new HTTPServer(router);
 
 server.listen(parseInt(args.port!));

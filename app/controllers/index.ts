@@ -1,9 +1,12 @@
 import { type Route } from "../lib";
 
-export default {
+const route: Route = {
+  method: "GET",
   name: "index",
   path: "/",
   handler: () => {
     console.log("index route handler run");
   },
-} as Route;
+};
+
+export default route;
