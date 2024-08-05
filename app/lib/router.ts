@@ -1,18 +1,11 @@
+import { HTTPContext } from "./context";
 import { HTTPMethod, HTTPRequest, HTTPResponse } from "./http";
 
 export interface Route {
   method: HTTPMethod;
   name: string;
   path: string;
-  handler: (req: HTTPRequest, res: HTTPResponse, ctx: RouteContext) => void;
-}
-
-export interface RouteContext {
-  params: Record<string, string> | null;
-}
-
-export function createRouterContext(): RouteContext {
-  return {} as RouteContext;
+  handler: (req: HTTPRequest, res: HTTPResponse, ctx: HTTPContext) => void;
 }
 
 export class Router {
@@ -21,7 +14,7 @@ export class Router {
   private static notFoundHandler(
     req: HTTPRequest,
     res: HTTPResponse,
-    ctx: RouteContext,
+    ctx: HTTPContext,
   ) {
     res.status("404 Not Found");
   }
@@ -54,7 +47,7 @@ export class Router {
   public handle(
     request: HTTPRequest,
     response: HTTPResponse,
-    ctx: RouteContext,
+    ctx: HTTPContext,
   ): Buffer {
     const matchingRoute = this.findMatchingRoute(
       request.target,
