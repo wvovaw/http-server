@@ -4,9 +4,9 @@ const route: Route = {
   method: "GET",
   name: "user-agent",
   path: "/user-agent",
-  handler: (req, res, ctx) => {
-    const userAgent = req.headers["User-Agent"];
-    res.send(userAgent);
+  handler: ({ request, response }) => {
+    const userAgent = request.headers["User-Agent"];
+    response.send(userAgent);
   },
 };
 export default route;

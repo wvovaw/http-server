@@ -5,18 +5,14 @@ export interface Route {
   method: HTTPMethod;
   name: string;
   path: string;
-  handler: (req: HTTPRequest, res: HTTPResponse, ctx: HTTPContext) => void;
+  handler: (ctx: HTTPContext) => void;
 }
 
 export class Router {
   constructor(public routes: Route[]) {}
 
-  private static notFoundHandler(
-    req: HTTPRequest,
-    res: HTTPResponse,
-    ctx: HTTPContext,
-  ) {
-    res.status("404 Not Found");
+  private static notFoundHandler({ response }: HTTPContext) {
+    response.status("404 Not Found");
   }
 
   private findMatchingRoute(target: string, method: HTTPMethod) {
@@ -44,24 +40,20 @@ export class Router {
     return params;
   }
 
-  public handle(
-    request: HTTPRequest,
-    response: HTTPResponse,
-    ctx: HTTPContext,
-  ): Buffer {
+  public handle(ctx: HTTPContext): Buffer {
     const matchingRoute = this.findMatchingRoute(
-      request.target,
-      request.method,
+      ctx.request.target,
+      ctx.request.method,
     );
 
     if (matchingRoute) {
-      const params = this.extractParams(request.target, matchingRoute);
+      const params = this.extractParams(ctx.request.target, matchingRoute);
       ctx.params = params;
-      matchingRoute.handler(request, response, ctx);
+      matchingRoute.handler(ctx);
     } else {
-      Router.notFoundHandler(request, response, ctx);
+      Router.notFoundHandler(ctx);
     }
 
-    return response.finish();
+    return ctx.response.finish();
   }
 }

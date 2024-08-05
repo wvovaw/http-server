@@ -1,9 +1,17 @@
+import { HTTPRequest, HTTPResponse } from "./http";
+
 export interface HTTPContext {
+  request: HTTPRequest;
+  response: HTTPResponse;
   params: Record<string, string> | null;
 }
 
-export function createrContext(): HTTPContext {
+export function createrContext(
+  request: HTTPRequest,
+  response: HTTPResponse,
+): HTTPContext {
   return {
-    params: null,
-  };
+    request,
+    response,
+  } as HTTPContext;
 }

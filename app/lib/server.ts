@@ -19,9 +19,9 @@ export class HTTPServer {
       socket.on("data", (buffer) => {
         const request = parseHttpRequest(buffer);
         const response = createHttpResponse();
-        const context = createrContext();
+        const context = createrContext(request, response);
 
-        const result = this.router.handle(request, response, context);
+        const result = this.router.handle(context);
         socket.write(result);
       });
 
