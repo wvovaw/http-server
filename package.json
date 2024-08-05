@@ -3,12 +3,14 @@
   "description": "Build your own HTTP Server challenge, from CodeCrafters",
   "type": "module",
   "scripts": {
-    "dev": "bun run app/main.ts"
+    "dev": "bun run app/main.ts",
+    "lint": "bunx biome check --write app/*.ts"
   },
   "dependencies": {
     "async": "^3.2.0"
   },
   "devDependencies": {
+    "@biomejs/biome": "1.8.3",
     "@types/bun": "^1.1.6",
     "@types/node": "^22.0.0"
   }
