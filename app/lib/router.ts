@@ -1,19 +1,17 @@
 import { HTTPContext } from "./context";
 import { HTTPMethod, HTTPRequest, HTTPResponse } from "./http";
 
+export type Handler = (ctx: HTTPContext) => void;
+
 export interface Route {
   method: HTTPMethod;
   name: string;
   path: string;
-  handler: (ctx: HTTPContext) => void;
+  handler: Handler;
 }
 
 export class Router {
   constructor(public routes: Route[]) {}
-
-  private static notFoundHandler({ response }: HTTPContext) {
-    response.status("404 Not Found");
-  }
 
   private findMatchingRoute(target: string, method: HTTPMethod) {
     const matchingRoute = this.routes.find((route) => {
@@ -40,7 +38,7 @@ export class Router {
     return params;
   }
 
-  public handle(ctx: HTTPContext): Buffer {
+  public getHandler(ctx: HTTPContext): Handler | null {
     const matchingRoute = this.findMatchingRoute(
       ctx.request.target,
       ctx.request.method,
@@ -49,11 +47,9 @@ export class Router {
     if (matchingRoute) {
       const params = this.extractParams(ctx.request.target, matchingRoute);
       ctx.params = params;
-      matchingRoute.handler(ctx);
+      return matchingRoute.handler;
     } else {
-      Router.notFoundHandler(ctx);
+      return null;
     }
-
-    return ctx.response.finish();
   }
 }

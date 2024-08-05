@@ -4,6 +4,7 @@ export interface HTTPContext {
   request: HTTPRequest;
   response: HTTPResponse;
   params: Record<string, string> | null;
+  _meta: Record<string, any>;
 }
 
 export function createrContext(
@@ -13,5 +14,6 @@ export function createrContext(
   return {
     request,
     response,
+    _meta: {},
   } as HTTPContext;
 }

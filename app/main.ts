@@ -14,4 +14,9 @@ const router = new Router([
 ]);
 const server = new HTTPServer(router);
 
+server.use((ctx, next) => {
+  console.log(`[${ctx.request.method}]: ${ctx.request.target}`);
+  next();
+});
+
 server.listen(parseInt(args.port!));
