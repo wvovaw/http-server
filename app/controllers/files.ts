@@ -1,27 +1,28 @@
-import { readFileSync, existsSync, writeFileSync } from "fs";
-import { resolve } from "path";
-import { type Route, decode } from "../lib";
+import { resolve } from "node:path";
 import { args } from "../config";
+import { type Route, decode } from "../lib";
+import { deleteFile, readFile, writeFile } from "../lib/utils";
 
 const download: Route = {
   method: "GET",
   name: "files",
   path: "/files/:filename",
   handler: ({ params, response }) => {
-    const filePath = resolve(args.directory!, params?.filename!);
-    const isFileExist = existsSync(filePath);
-
-    if (isFileExist) {
-      const fileContent = readFileSync(filePath);
-      response
-        .headers({
-          "Content-Type": "application/octet-stream",
-        })
-        .status("200 OK")
-        .send(decode(fileContent));
-    } else {
-      response.status("404 Not Found");
+    const filename = params?.filename;
+    if (filename) {
+      const content = readFile(resolve(args.directory, filename));
+      if (content) {
+        response
+          .headers({
+            "Content-Type": "application/octet-stream",
+          })
+          .status("200 OK")
+          .send(decode(content));
+        return;
+      }
     }
+
+    response.status("404 Not Found");
   },
 };
 const upload: Route = {
@@ -29,23 +30,35 @@ const upload: Route = {
   name: "files",
   path: "/files/:filename",
   handler: ({ request, response, params }) => {
-    const filePath = resolve(args.directory!, params?.filename!);
-    const fileContent = request.body;
+    const filename = params?.filename;
+    if (filename) {
+      const filePath = resolve(args.directory, filename);
+      const content = request.body;
 
-    try {
-      writeFileSync(filePath, fileContent);
-      response
-        .headers({
-          "Content-Type": "application/octet-stream",
-        })
-        .status("201 Created");
-    } catch (e: unknown) {
-      if (e instanceof Error)
-        response.send(e.message).status("500 Internal Server Error");
-    }
+      writeFile(filePath, content);
+      response.status("201 Created");
+    } else
+      response.status("400 Bad Request").send("Incorrect filename provided");
+  },
+};
+
+const destroy: Route = {
+  method: "DELETE",
+  name: "files",
+  path: "/files/:filename",
+  handler: ({ response, params }) => {
+    const filename = params?.filename;
+    if (filename) {
+      const filePath = resolve(args.directory, filename);
+
+      deleteFile(filePath);
+      response.status("204 No Content");
+    } else
+      response.status("400 Bad Request").send("Incorrect filename provided");
   },
 };
 export default {
   download,
   upload,
+  destroy,
 };

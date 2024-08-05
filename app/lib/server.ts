@@ -1,10 +1,9 @@
-import { createServer, Server } from "net";
+import { type Server, createServer } from "node:net";
+import { type HTTPContext, createrContext } from "./context";
 import { createHttpResponse, parseHttpRequest } from "./http";
-import type { HTTPRequest, HTTPResponse } from "./http";
-import { type Handler, Router } from "./router";
-import { createrContext, type HTTPContext } from "./context";
+import type { Handler, Router } from "./router";
 
-type MiddlewareFn = (ctx: HTTPContext, next: Function) => void;
+type MiddlewareFn = (ctx: HTTPContext, next: () => void) => void;
 
 export class HTTPServer {
   private tcpServer: Server;
@@ -27,7 +26,7 @@ export class HTTPServer {
     });
   }
 
-  public listen(port: number, host: string = "localhost") {
+  public listen(port: number, host = "localhost") {
     this.tcpServer.listen(port, host);
   }
 
@@ -43,7 +42,10 @@ export class HTTPServer {
     ctx._meta.globalMwIx = 0;
 
     const next = () => {
-      if (ctx._meta.globalMwIx < this.globalMiddleware.length) {
+      if (
+        typeof ctx._meta.globalMwIx === "number" &&
+        ctx._meta.globalMwIx < this.globalMiddleware.length
+      ) {
         const mw = this.globalMiddleware[ctx._meta.globalMwIx++];
         mw(ctx, next);
       } else {
@@ -59,16 +61,17 @@ export class HTTPServer {
     try {
       next();
     } catch (e: unknown) {
-      ServerErrorHandler(ctx);
-    } finally {
-      return ctx.response.finish();
+      if (e instanceof Error) {
+        ServerErrorHandler(ctx);
+      }
     }
+    return ctx.response.finish();
   }
 }
 
-const NotFoundHandler: Handler = function (ctx) {
+const NotFoundHandler: Handler = (ctx) => {
   ctx.response.status("404 Not Found");
 };
-const ServerErrorHandler: Handler = function (ctx) {
+const ServerErrorHandler: Handler = (ctx) => {
   ctx.response.status("500 Internal Server Error");
 };

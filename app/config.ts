@@ -1,4 +1,4 @@
-import { parseArgs } from "util";
+import { parseArgs } from "node:util";
 
 export const { values: args } = parseArgs({
   args: Bun.argv,
@@ -15,4 +15,9 @@ export const { values: args } = parseArgs({
     },
   },
   allowPositionals: true,
-});
+}) as {
+  values: {
+    directory: string;
+    port: string;
+  };
+};

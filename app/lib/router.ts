@@ -1,5 +1,5 @@
-import { HTTPContext } from "./context";
-import { HTTPMethod, HTTPRequest, HTTPResponse } from "./http";
+import type { HTTPContext } from "./context";
+import type { HTTPMethod } from "./http";
 
 export type Handler = (ctx: HTTPContext) => void;
 
@@ -48,8 +48,7 @@ export class Router {
       const params = this.extractParams(ctx.request.target, matchingRoute);
       ctx.params = params;
       return matchingRoute.handler;
-    } else {
-      return null;
     }
+    return null;
   }
 }

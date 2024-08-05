@@ -1,10 +1,10 @@
-import { HTTPRequest, HTTPResponse } from "./http";
+import type { HTTPRequest, HTTPResponse } from "./http";
 
 export interface HTTPContext {
   request: HTTPRequest;
   response: HTTPResponse;
   params: Record<string, string> | null;
-  _meta: Record<string, any>;
+  _meta: Record<string, unknown>;
 }
 
 export function createrContext(

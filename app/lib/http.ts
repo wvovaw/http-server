@@ -1,4 +1,3 @@
-import { Socket } from "net";
 import { decode, encode } from "./utils";
 
 export type HTTPMethod =
@@ -36,12 +35,12 @@ export function parseHttpRequest(buffer: Buffer): HTTPRequest {
   const version = options[2] as HTTPVersion;
 
   const headers = {} as HTTPHeaders;
-  metaLines.slice(1).forEach((line) => {
+  for (const line of metaLines.slice(1)) {
     const parts = line.split(": ");
     const key = parts[0];
     const value = parts.slice(1).join(": ");
     headers[key] = value;
-  });
+  }
 
   return {
     version,
@@ -53,13 +52,11 @@ export function parseHttpRequest(buffer: Buffer): HTTPRequest {
 }
 
 export class HTTPResponse {
-  private _data: string = "";
+  private _data = "";
   private _code: HTTPStatusCode = "200 OK";
   private _headers: HTTPHeaders = {
     "Content-Type": "text/plain",
   };
-
-  constructor() {}
 
   public send(data: string) {
     this._data = String(data);

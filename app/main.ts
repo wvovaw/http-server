@@ -1,9 +1,9 @@
-import { Router, HTTPServer } from "./lib";
-import index from "./controllers/index";
-import userAgent from "./controllers/user-agent";
+import { args } from "./config";
 import echo from "./controllers/echo";
 import files from "./controllers/files";
-import { args } from "./config";
+import index from "./controllers/index";
+import userAgent from "./controllers/user-agent";
+import { HTTPServer, Router } from "./lib";
 
 const router = new Router([
   index,
@@ -11,6 +11,7 @@ const router = new Router([
   echo,
   files.upload,
   files.download,
+  files.destroy,
 ]);
 const server = new HTTPServer(router);
 
@@ -19,4 +20,4 @@ server.use((ctx, next) => {
   next();
 });
 
-server.listen(parseInt(args.port!));
+server.listen(Number.parseInt(args.port ?? "3000"));

@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "bun run app/main.ts",
-    "lint": "bunx biome check --write app/*.ts"
+    "lint": "bunx biome check --write app/*"
   },
   "dependencies": {
     "async": "^3.2.0"

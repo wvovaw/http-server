@@ -3,10 +3,25 @@
   "organizeImports": {
     "enabled": true
   },
+  "formatter": {
+    "lineEnding": "lf",
+    "indentStyle": "space",
+    "indentWidth": 2
+  },
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true
+      "recommended": true,
+      "correctness": {
+        "noUnusedImports": "warn",
+        "noUnusedVariables": "warn"
+      },
+      "complexity": {
+        "noBannedTypes": {
+          "fix": "safe",
+          "level": "error"
+        }
+      }
     }
   }
 }
