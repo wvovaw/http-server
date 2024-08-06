@@ -4,6 +4,7 @@ import files from "./controllers/files";
 import index from "./controllers/index";
 import userAgent from "./controllers/user-agent";
 import { HTTPServer, Router } from "./lib";
+import compression from "./middleware/compression";
 
 const router = new Router([
   index,
@@ -15,6 +16,7 @@ const router = new Router([
 ]);
 const server = new HTTPServer(router);
 
+server.use(compression);
 server.use((ctx, next) => {
   console.log(`[${ctx.request.method}]: ${ctx.request.target}`);
   next();

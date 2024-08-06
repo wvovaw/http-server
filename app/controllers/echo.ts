@@ -6,7 +6,7 @@ const route: Route = {
   path: "/user-agent",
   handler: ({ request, response }) => {
     const userAgent = request.headers["User-Agent"];
-    response.send(userAgent);
+    response.body = userAgent;
   },
 };
 export default route;

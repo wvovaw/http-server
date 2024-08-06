@@ -13,7 +13,7 @@ export type HTTPMethod =
 type HTTPVersion = "HTTP/1.1";
 type HTTPStatusCode = string;
 
-type HTTPHeaders = Record<string, string>;
+type HTTPHeaders = Record<string, string | undefined>;
 type HTTPBody = string;
 
 export interface HTTPRequest {
@@ -53,31 +53,40 @@ export function parseHttpRequest(buffer: Buffer): HTTPRequest {
 
 export class HTTPResponse {
   private _data = "";
-  private _code: HTTPStatusCode = "200 OK";
+  private _status: HTTPStatusCode = "200 OK";
   private _headers: HTTPHeaders = {
     "Content-Type": "text/plain",
   };
 
-  public send(data: string) {
+  set body(data: string) {
     this._data = String(data);
-    this.headers({
-      "Content-Length": String(this._data.length),
-    });
-    return this;
+    this.setHeader("Content-Length", String(this._data.length));
   }
-  public status(code: HTTPStatusCode) {
-    this._code = code;
-    return this;
+  get body() {
+    return this._data;
   }
-  public headers(headers: HTTPHeaders) {
-    Object.assign(this._headers, headers);
-    return this;
+
+  set headers(headers: HTTPHeaders) {
+    this._headers = headers;
+  }
+  get headers() {
+    return this._headers;
+  }
+  public setHeader(key: string, value: HTTPHeaders[string]) {
+    this._headers[key] = value;
+  }
+
+  set status(code: HTTPStatusCode) {
+    this._status = code;
+  }
+  get status() {
+    return this._status;
   }
 
   private static encodeToHTTP(response: HTTPResponse): Buffer {
     const ENDL = "\r\n";
-    const statusLine = `HTTP/1.1 ${response._code}${ENDL}`;
-    const headers = Object.entries(response._headers)
+    const statusLine = `HTTP/1.1 ${response.status}${ENDL}`;
+    const headers = Object.entries(response.headers)
       .map(([key, value]) => {
         return `${key}: ${value}`;
       })

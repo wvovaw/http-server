@@ -7,7 +7,7 @@ const route: Route = {
   handler: ({ response, params }) => {
     if (params) {
       console.log("echo route handler run with the :msg = ", params?.msg);
-      response.send(params.msg);
+      response.body = params.msg;
     }
   },
 };

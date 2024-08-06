@@ -51,6 +51,7 @@ export class HTTPServer {
       } else {
         const handler = this.router.getHandler(ctx);
         if (handler) {
+          console.log("MW RAN, NOW HANDLER");
           handler(ctx);
         } else {
           NotFoundHandler(ctx);
@@ -62,6 +63,7 @@ export class HTTPServer {
       next();
     } catch (e: unknown) {
       if (e instanceof Error) {
+        console.log(e);
         ServerErrorHandler(ctx);
       }
     }
@@ -70,8 +72,10 @@ export class HTTPServer {
 }
 
 const NotFoundHandler: Handler = (ctx) => {
-  ctx.response.status("404 Not Found");
+  console.log("404 HANDLER CALL");
+  ctx.response.status = "404 Not Found";
 };
 const ServerErrorHandler: Handler = (ctx) => {
-  ctx.response.status("500 Internal Server Error");
+  console.log("500 HANDLER CALL");
+  ctx.response.status = "500 Internal Server Error";
 };
